@@ -1,58 +1,98 @@
+p450
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+  <section class="alert alert-primary">
+    <h1>{{ data.title }}</h1>
+    <p>{{ data.message }}</p>
+    <div class="text-left"> 
+    <div class="form-group">
+      <label>Email</label>
+      <input type="text" v-model="data.email" class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" v-model="data.username" class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Age</label>
+      <input type="number" v-model="data.age" class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Tel</label>
+      <input type="text" v-model="data.tel" class="form-control">
+    </div>
+      <button @click="addData" class="btn btn-primary">Click</button>
+    </div>
+
+    <ul v-for="(item,key) in data.fire_data" v-bind:key="key" class="list-group">
+      <li class="list-group-item text-left">
+        <strong>{{key}}</strong><br>{{item}}</li>
+    </ul>    
+    </section>  
 </template>
 
 <script>
-export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+import axios from 'axios'
+import { onMounted, reactive } from "vue";
+
+let url = "https://test-23479-default-rtdb.firebaseio.com/person"
+
+export default {  
+  //propsの内容を使って処理を行うときは、propsを引数に書く
+  setup() {
+    //値の定義
+    const data = reactive({
+      title:'Firebase',  
+      message:'This is Firebase sample.',
+      email:'',
+      username:'', 
+      tel:'', 
+      age:0,             
+      fire_data:{},         
+    })
+
+    const addData = ()=>{
+      if(data.username==''){
+        console.log('no-username')
+        return
+      }
+      let add_url =url + '/' + data.email + '.json'
+      let item ={
+        'name':data.username,
+        'age':data.age,
+        'tel':data.tel,
+      }
+
+      axios.put(add_url,item).then(()=>{
+        data.email=''
+        data.username=''
+        data.age=0
+        data.tel=''
+        getData()
+      })
+    }
+
+ //asyncの書き方
+    const getData =()=>{
+      let all_url = url + ".json"
+      axios.get(all_url).then((result)=>{
+        data.message='get all data.'
+        data.fire_data=result.data
+      }).catch((error)=>{
+        data.message="ERROR";
+        data.fire_data={};
+        console.log(error)
+      })
+    }
+      
+    onMounted(()=>{
+      getData()
+    })
+    return {data,addData,getData}
+  },
+  
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+<style>
+
 </style>

@@ -1,0 +1,33 @@
+<template>
+  <div id="app">
+    <Hello-world title="slot">
+      <li class="list-group-item"
+      v-for="obj in slotobjs"
+      v-bind:key="obj.name">
+      {{obj.name}}  ({{obj.mail}})
+      </li>
+    </Hello-world>
+  </div>
+</template>
+
+<script>
+import HelloWorld from './components/HelloWorld.vue';
+
+export default {
+  name: "app",
+  components: {
+    HelloWorld    
+  },
+  
+  data() {
+    return {
+      slotobjs:[
+        {name:'Taro',mail:'taro@yamada'},
+        {name:'Hanako',mail:'hanako@flower'},
+        {name:'Sachiko',mail:'sachiko@happy'},
+      ],
+    }
+  }  
+}
+</script>
+
